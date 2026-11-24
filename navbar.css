@@ -1,0 +1,265 @@
+/* ==========================================================================
+   navbar.css — Unified Navigation Module for Cybersecurity Learning Suite
+   Connects:
+   - Topic 01: Application Layer DDoS (8-ApplicationLayerDDoS.html)
+   - Topic 02: XSS Cookie Theft Mechanics (8-XSSCookieTheft.html / XSS-CookieTheft-Mechanics.html)
+   - Topic 03: Konstruksi Rule-Base Firewall (konstruksi-rulebase-firewall.html)
+   ========================================================================== */
+
+/* Top Master Navigation Bar */
+.master-nav-suite {
+  position: sticky;
+  top: 0;
+  z-index: 950;
+  background: rgba(10, 44, 71, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(127, 211, 255, 0.25);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  padding: 10px clamp(16px, 3vw, 36px);
+  font-family: var(--font-display, "Space Grotesk", system-ui, sans-serif);
+}
+
+@media (min-width: 901px) {
+  .master-nav-suite {
+    margin-left: var(--sidebar-w, 280px); /* Leave room for fixed sidebar, never overlap brand! */
+    width: calc(100% - var(--sidebar-w, 280px));
+  }
+  .master-suite-brand {
+    display: none; /* Hide in navbar because sidebar already displays brand */
+  }
+  .master-nav-inner {
+    justify-content: center;
+  }
+}
+
+.master-nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.master-suite-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.master-suite-brand .suite-tag {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--bp-cyan, #7FD3FF);
+  text-transform: uppercase;
+}
+
+.master-suite-brand .suite-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+.master-nav-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  gap: 12px;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto; /* Centered in the navbar */
+}
+
+.master-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center items inside the tab */
+  text-align: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(127, 211, 255, 0.18);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--bp-line-soft, rgba(234, 244, 251, 0.75));
+  transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.master-nav-item:hover {
+  background: rgba(127, 211, 255, 0.1);
+  border-color: rgba(127, 211, 255, 0.45);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.master-nav-item.active {
+  background: linear-gradient(135deg, rgba(127, 211, 255, 0.24), rgba(15, 59, 95, 0.7));
+  border-color: var(--bp-cyan, #7FD3FF);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(127, 211, 255, 0.22);
+}
+
+.master-nav-item .nav-badge {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bp-cyan, #7FD3FF);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(127, 211, 255, 0.3);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.master-nav-item.active .nav-badge {
+  background: var(--bp-cyan, #7FD3FF);
+  color: #0A2C47;
+  border-color: #fff;
+}
+
+.master-nav-item .nav-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center the text */
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+.master-nav-item .nav-name {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.master-nav-item .nav-desc {
+  font-size: 10px;
+  opacity: 0.75;
+  white-space: nowrap;
+  margin-top: 1px;
+}
+
+/* Sidebar Topic Switcher */
+.sidebar-topic-switcher {
+  margin: 14px 16px 18px;
+  padding: 10px;
+  background: rgba(10, 44, 71, 0.6);
+  border: 1px solid rgba(127, 211, 255, 0.2);
+  border-radius: 10px;
+}
+
+.topic-switcher-heading {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--bp-cyan, #7FD3FF);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.topic-switcher-heading::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(127, 211, 255, 0.15);
+}
+
+.topic-switcher-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.topic-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--bp-line-soft, rgba(234, 244, 251, 0.75));
+  text-decoration: none;
+  font-family: var(--font-display, "Space Grotesk", system-ui, sans-serif);
+  font-size: 12px;
+  transition: all 0.18s ease;
+}
+
+.topic-btn:hover {
+  background: rgba(127, 211, 255, 0.08);
+  border-color: rgba(127, 211, 255, 0.35);
+  color: #fff;
+}
+
+.topic-btn.active {
+  background: rgba(127, 211, 255, 0.18);
+  border-color: var(--bp-cyan, #7FD3FF);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(127, 211, 255, 0.4);
+}
+
+.topic-btn .btn-num {
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--bp-cyan, #7FD3FF);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+
+.topic-btn.active .btn-num {
+  background: var(--bp-cyan, #7FD3FF);
+  color: #0A2C47;
+}
+
+.topic-btn .btn-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.topic-btn .btn-text small {
+  font-size: 9.5px;
+  opacity: 0.72;
+}
+
+/* Global Fix for Header Numbers (01, 02, 03, ...) */
+.onum {
+  width: clamp(100px, 9vw, 140px) !important;
+  height: auto !important;
+  overflow: visible !important;
+  flex-shrink: 0;
+}
+
+.onum text {
+  font-family: var(--font-display, "Space Grotesk", system-ui, sans-serif) !important;
+  font-size: 86px !important;
+  font-weight: 700 !important;
+  fill: rgba(127, 211, 255, 0.22) !important;
+  stroke: var(--bp-cyan, #7FD3FF) !important;
+  stroke-width: 2 !important;
+  stroke-dasharray: none !important;
+  stroke-dashoffset: 0 !important;
+  opacity: 1 !important;
+}
+
+@media (max-width: 900px) {
+  .master-nav-tabs {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+}
