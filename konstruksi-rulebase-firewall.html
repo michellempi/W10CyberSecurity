@@ -1241,7 +1241,7 @@ body.present .sheet__inner, body.present .sheet .titleblock-wrap { max-width: 13
   <script>
     // Mark JS availability early (reveal animations only apply with JS) and restore theme.
     document.documentElement.classList.add('js');
-    try { if (localStorage.getItem('fw-theme') === 'kalkir') document.documentElement.setAttribute('data-theme', 'kalkir'); } catch (e) {}
+    try { if (localStorage.getItem('fw-theme') === 'kalkir' || localStorage.getItem('suite-theme') === 'kalkir') document.documentElement.setAttribute('data-theme', 'kalkir'); } catch (e) {}
     // Collect runtime errors (used by the self-check in README / headless test).
     window.__fwErrors = [];
     window.addEventListener('error', function (e) { window.__fwErrors.push(String(e.message)); document.documentElement.setAttribute('data-errors', window.__fwErrors.length); });
@@ -2776,7 +2776,7 @@ body.present .sheet__inner, body.present .sheet .titleblock-wrap { max-width: 13
   // Optional generated sounds; off by default.
   var sound = (function () {
     var ctx = null, on = false;
-    try { on = localStorage.getItem('fw-sound') === 'on'; } catch (e) {}
+    try { on = localStorage.getItem('fw-sound') === 'on' || localStorage.getItem('suite-sound') === 'on'; } catch (e) {}
     function tone(freq, dur, type, vol, slideTo) {
       if (!on) return;
       try {
@@ -2790,7 +2790,7 @@ body.present .sheet__inner, body.present .sheet .titleblock-wrap { max-width: 13
     }
     return {
       isOn: function () { return on; },
-      set: function (v) { on = v; try { localStorage.setItem('fw-sound', v ? 'on' : 'off'); } catch (e) {} },
+      set: function (v) { on = v; try { localStorage.setItem('fw-sound', v ? 'on' : 'off'); localStorage.setItem('suite-sound', v ? 'on' : 'off'); } catch (e) {} },
       play: function (name) {
         if (name === 'tick') tone(1400, 0.04, 'square', 0.025);
         else if (name === 'thunk') tone(140, 0.18, 'triangle', 0.18, 60);
@@ -3308,7 +3308,7 @@ body.present .sheet__inner, body.present .sheet .titleblock-wrap { max-width: 13
     bt.addEventListener('click', function () {
       var k = document.documentElement.getAttribute('data-theme') === 'kalkir';
       if (k) document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', 'kalkir');
-      try { localStorage.setItem('fw-theme', k ? 'blueprint' : 'kalkir'); } catch (e) {}
+      try { localStorage.setItem('fw-theme', k ? 'blueprint' : 'kalkir'); localStorage.setItem('suite-theme', k ? 'blueprint' : 'kalkir'); } catch (e) {}
       syncTheme();
     });
     function syncSound() { bs.setAttribute('aria-pressed', String(sound.isOn())); bs.innerHTML = sound.isOn() ? '<i class="ic ic-sound-on" aria-hidden="true"></i>Suara: hidup' : '<i class="ic ic-sound-off" aria-hidden="true"></i>Suara: mati'; }

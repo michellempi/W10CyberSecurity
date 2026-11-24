@@ -2,6 +2,9 @@
 <html lang="id">
 <head>
   <meta charset="utf-8">
+  <script>
+    try { if (localStorage.getItem('fw-theme') === 'kalkir' || localStorage.getItem('suite-theme') === 'kalkir') document.documentElement.setAttribute('data-theme', 'kalkir'); } catch (e) {}
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>XSS Cookie Theft Mechanics · Cybersecurity Interactive Learning Suite</title>
   <link rel="stylesheet" href="navbar.css">
@@ -1032,6 +1035,12 @@ body.present .sheet.is-current { display: flex; animation: unrollSheet .6s var(-
 body.present .sheet.is-current.from-prev { animation-name: unrollSheet; }
 body.present .sheet__inner, body.present .sheet .titleblock-wrap { max-width: 1320px; }
 
+@keyframes unrollSheet {
+  0% { opacity: 0; transform: perspective(1400px) rotateX(-8deg) scaleY(.08); box-shadow: 0 -30px 60px rgba(0,0,0,.4); }
+  60% { opacity: 1; }
+  100% { opacity: 1; transform: none; box-shadow: none; }
+}
+
 /* ========================================== responsive */
 @media (max-width: 1000px) {
   .hero { grid-template-columns: 1fr; min-height: 0; }
@@ -1415,9 +1424,9 @@ body.theme-tracing .quiz-q { color: #102A43; }
 
   <aside class="sidebar" id="sidebar" aria-label="Daftar sheet">
     <div class="brand">
-      <div class="brand__eyebrow">INFORMATICS · CYBER SECURITY</div>
+      <div class="brand__eyebrow">INFORMATICS · UC</div>
       <div class="brand__title">XSS Cookie Theft Mechanics</div>
-      <span class="brand__hand">blueprint interaktif ✎</span>
+      <span class="brand__hand">blueprint interaktif</span>
     </div>
 
     <!-- Sidebar Topic Switcher -->
@@ -1448,7 +1457,9 @@ body.theme-tracing .quiz-q { color: #102A43; }
     </nav>
 
     <div class="sidebar__foot">
-      <button class="btn btn--sm btn--ghost" type="button" id="btn-theme" aria-pressed="false">◐ Tema Kalkir</button>
+      <button class="btn btn--sm" type="button" id="btn-present" aria-pressed="false"><i class="ic ic-present" aria-hidden="true"></i>Mode Presentasi</button>
+      <button class="btn btn--sm btn--ghost" type="button" id="btn-theme" aria-pressed="false"><i class="ic ic-contrast" aria-hidden="true"></i>Tema Kalkir</button>
+      <button class="btn btn--sm btn--ghost" type="button" id="btn-sound" aria-pressed="false"><i class="ic ic-sound-off" aria-hidden="true"></i>Suara: mati</button>
     </div>
   </aside>
 
@@ -1992,49 +2003,255 @@ body.theme-tracing .quiz-q { color: #102A43; }
           </div>
   </main>
 
+  <!-- Presentation controls -->
+  <div class="pres-ctl" role="toolbar" aria-label="Kontrol presentasi">
+    <button type="button" id="pres-prev" aria-label="Sheet sebelumnya"><i class="ic ic-prev" aria-hidden="true"></i></button>
+    <span class="count" id="pres-count">SHEET 01/07</span>
+    <button type="button" id="pres-next" aria-label="Sheet berikutnya"><i class="ic ic-next" aria-hidden="true"></i></button>
+    <button type="button" class="x" id="pres-exit" aria-label="Keluar dari mode presentasi"><i class="ic ic-x" aria-hidden="true"></i> ESC</button>
+  </div>
+
   <script>
   (function() {
     'use strict';
+
+    /* ================================================================= sound */
+    var sound = (function () {
+      var ctx = null, on = false;
+      try { on = localStorage.getItem('fw-sound') === 'on' || localStorage.getItem('suite-sound') === 'on'; } catch (e) {}
+      function tone(freq, dur, type, vol, slideTo) {
+        if (!on) return;
+        try {
+          ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+          var o = ctx.createOscillator(), g = ctx.createGain(), t = ctx.currentTime;
+          o.type = type || 'sine'; o.frequency.setValueAtTime(freq, t);
+          if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+          g.gain.setValueAtTime(vol || 0.08, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+          o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + dur + 0.02);
+        } catch (e) { /* audio unavailable */ }
+      }
+      return {
+        isOn: function () { return on; },
+        set: function (v) {
+          on = v;
+          try {
+            localStorage.setItem('fw-sound', v ? 'on' : 'off');
+            localStorage.setItem('suite-sound', v ? 'on' : 'off');
+          } catch (e) {}
+        },
+        play: function (name) {
+          if (name === 'tick') tone(1400, 0.04, 'square', 0.025);
+          else if (name === 'thunk') tone(140, 0.18, 'triangle', 0.18, 60);
+          else if (name === 'chime') { tone(660, 0.18, 'sine', 0.08); setTimeout(function () { tone(990, 0.3, 'sine', 0.08); }, 110); }
+          else if (name === 'buzz') tone(110, 0.28, 'sawtooth', 0.06);
+        }
+      };
+    })();
+    window.suiteSound = sound;
+
+    /* ================================================= nav & menu */
     var hb = document.querySelector('.hamburger');
     var navLinks = document.querySelectorAll('#nav a');
-    var btnTheme = document.getElementById('btn-theme');
+    var scrim = document.querySelector('.scrim');
 
     if (hb) {
       hb.addEventListener('click', function() {
         document.body.classList.toggle('nav-open');
       });
     }
-    var scrim = document.querySelector('.scrim');
     if (scrim) {
       scrim.addEventListener('click', function() {
         document.body.classList.remove('nav-open');
       });
     }
+    navLinks.forEach(function (a) {
+      a.addEventListener('click', function () {
+        document.body.classList.remove('nav-open');
+      });
+    });
 
-    if (btnTheme) {
-      btnTheme.addEventListener('click', function() {
-        var on = document.body.classList.toggle('theme-tracing');
-        btnTheme.setAttribute('aria-pressed', String(on));
+    /* ================================================= sheets & ruler */
+    var sheets = Array.prototype.slice.call(document.querySelectorAll('.sheet'));
+    var current = 0;
+    var presenting = false;
+    var rulerLine = document.getElementById('ruler-line');
+
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+    function setActive(idx) {
+      current = idx;
+      var activeId = sheets[idx] ? sheets[idx].id : '';
+      navLinks.forEach(function(a, j) {
+        if (a.getAttribute('href') === '#' + activeId) {
+          a.classList.add('active');
+          a.setAttribute('aria-current', 'true');
+        } else {
+          a.classList.remove('active');
+          a.removeAttribute('aria-current');
+        }
+      });
+      updateRuler();
+    }
+
+    function updateRuler() {
+      if (!rulerLine) return;
+      var frac;
+      if (presenting) frac = (current + 1) / sheets.length;
+      else {
+        var max = document.documentElement.scrollHeight - window.innerHeight;
+        frac = max > 0 ? window.scrollY / max : 0;
+      }
+      rulerLine.style.transform = 'scaleX(' + Math.min(1, Math.max(0, frac)) + ')';
+    }
+
+    /* ================================================= presentation mode */
+    function setPresenting(on) {
+      presenting = on;
+      document.body.classList.toggle('present', on);
+      var btnPresent = document.getElementById('btn-present');
+      if (btnPresent) {
+        btnPresent.setAttribute('aria-pressed', String(on));
+        btnPresent.classList.toggle('is-on', on);
+      }
+      if (on) {
+        showSheet(current, true);
+      } else {
+        sheets.forEach(function (s) { s.classList.remove('is-current'); });
+        if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {});
+        if (sheets[current]) sheets[current].scrollIntoView({ behavior: 'auto' });
+      }
+      updateRuler();
+    }
+
+    function showSheet(i, instant) {
+      i = Math.max(0, Math.min(sheets.length - 1, i));
+      sheets.forEach(function (s, j) { s.classList.toggle('is-current', j === i); });
+      setActive(i);
+      var presCount = document.getElementById('pres-count');
+      var presPrev = document.getElementById('pres-prev');
+      var presNext = document.getElementById('pres-next');
+      if (presCount) presCount.textContent = 'SHEET ' + pad(i + 1) + '/' + pad(sheets.length);
+      if (presPrev) presPrev.disabled = i === 0;
+      if (presNext) presNext.disabled = i === sheets.length - 1;
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      if (!instant) sound.play('tick');
+      if (history.replaceState) history.replaceState(null, '', '#' + sheets[i].id);
+    }
+
+    function goToElement(el) {
+      var sheet = el.closest('.sheet');
+      if (presenting && sheet) {
+        showSheet(sheets.indexOf(sheet));
+        setTimeout(function () { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 80);
+      } else {
+        el.scrollIntoView({ behavior: 'smooth', block: el.classList.contains('sheet') ? 'start' : 'center' });
+      }
+    }
+
+    function initPresentation() {
+      var btnPresent = document.getElementById('btn-present');
+      var presPrev = document.getElementById('pres-prev');
+      var presNext = document.getElementById('pres-next');
+      var presExit = document.getElementById('pres-exit');
+
+      if (btnPresent) btnPresent.addEventListener('click', function () { setPresenting(!presenting); });
+      if (presPrev) presPrev.addEventListener('click', function () { showSheet(current - 1); });
+      if (presNext) presNext.addEventListener('click', function () { showSheet(current + 1); });
+      if (presExit) presExit.addEventListener('click', function () { setPresenting(false); });
+
+      document.addEventListener('keydown', function (e) {
+        var t = e.target, tag = (t.tagName || '').toLowerCase();
+        var typing = tag === 'input' || tag === 'textarea' || tag === 'select' || t.isContentEditable;
+        if (typing || e.ctrlKey || e.metaKey || e.altKey) return;
+        if (presenting && (e.key === 'ArrowRight' || e.key === 'PageDown')) { e.preventDefault(); showSheet(current + 1); }
+        else if (presenting && (e.key === 'ArrowLeft' || e.key === 'PageUp')) { e.preventDefault(); showSheet(current - 1); }
+        else if (presenting && e.key === 'Escape' && !document.fullscreenElement) { setPresenting(false); }
+        else if (e.key === 'f' || e.key === 'F') {
+          if (!presenting) setPresenting(true);
+          if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
+          else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function () {});
+        }
+      });
+
+      document.addEventListener('click', function (e) {
+        var a = e.target.closest && e.target.closest('a[href^="#"]');
+        if (!a || a.closest('#nav')) return;
+        var target = document.getElementById(a.getAttribute('href').slice(1));
+        if (!target) return;
+        if (presenting) { e.preventDefault(); goToElement(target); }
       });
     }
 
-    var sheets = document.querySelectorAll('.sheet');
+    /* ================================================= theme / sound buttons */
+    function initToggles() {
+      var bt = document.getElementById('btn-theme');
+      var bs = document.getElementById('btn-sound');
+
+      function syncTheme() {
+        var k = document.documentElement.getAttribute('data-theme') === 'kalkir';
+        if (bt) {
+          bt.setAttribute('aria-pressed', String(k));
+          bt.innerHTML = '<i class="ic ic-contrast" aria-hidden="true"></i>' + (k ? 'Tema Blueprint' : 'Tema Kalkir');
+        }
+        document.body.classList.toggle('theme-tracing', k);
+      }
+
+      if (bt) {
+        bt.addEventListener('click', function () {
+          var k = document.documentElement.getAttribute('data-theme') === 'kalkir';
+          if (k) {
+            document.documentElement.removeAttribute('data-theme');
+          } else {
+            document.documentElement.setAttribute('data-theme', 'kalkir');
+          }
+          try {
+            localStorage.setItem('fw-theme', k ? 'blueprint' : 'kalkir');
+            localStorage.setItem('suite-theme', k ? 'blueprint' : 'kalkir');
+          } catch (e) {}
+          syncTheme();
+        });
+      }
+
+      function syncSound() {
+        if (bs) {
+          bs.setAttribute('aria-pressed', String(sound.isOn()));
+          bs.innerHTML = sound.isOn() ?
+            '<i class="ic ic-sound-on" aria-hidden="true"></i>Suara: hidup' :
+            '<i class="ic ic-sound-off" aria-hidden="true"></i>Suara: mati';
+        }
+      }
+
+      if (bs) {
+        bs.addEventListener('click', function () {
+          sound.set(!sound.isOn());
+          syncSound();
+          if (sound.isOn()) sound.play('chime');
+        });
+      }
+
+      syncTheme();
+      syncSound();
+    }
+
     function updateActiveNav() {
+      if (presenting) return;
       var scrollPos = window.scrollY + 200;
-      sheets.forEach(function(s) {
+      sheets.forEach(function(s, idx) {
         var top = s.offsetTop;
         var height = s.offsetHeight;
         if (scrollPos >= top && scrollPos < top + height) {
-          var id = s.id;
-          navLinks.forEach(function(a) {
-            a.classList.toggle('active', a.getAttribute('href') === '#' + id);
-          });
+          setActive(idx);
         }
       });
+      updateRuler();
     }
+
     window.addEventListener('scroll', updateActiveNav);
+    initPresentation();
+    initToggles();
+    setActive(0);
   })();
-</script>
+  </script>
   <script>
   (function() {
     'use strict';
@@ -2105,6 +2322,7 @@ body.theme-tracing .quiz-q { color: #102A43; }
           simEvalTitle.textContent = 'Mitigasi Berhasil: Output HTML Encoding Aktif!';
           simEvalDesc.textContent = 'Karakter berbahaya seperti < dan > telah diubah menjadi entitas &lt; dan &gt;. Peramban korban merendernya sebagai teks biasa murni, sehingga skrip penyerang tidak pernah dieksekusi.';
           simTerminalLog.insertAdjacentHTML('afterbegin', '<div class="term-line safe">[BLOCKED] Muatan dinetralisir oleh Context-Aware Encoding. Tidak ada eksekusi JS.</div>');
+          if (window.suiteSound) window.suiteSound.play('chime');
           return;
         }
 
@@ -2114,6 +2332,7 @@ body.theme-tracing .quiz-q { color: #102A43; }
           simEvalTitle.textContent = 'Mitigasi Berhasil: Content Security Policy (CSP) Memblokir Transmisi!';
           simEvalDesc.textContent = 'Kebijakan CSP (connect-src / img-src) melarang peramban mengirim data atau memuat aset dari domain luar http://attacker-c2.id. Percobaan koneksi beacon langsung digagalkan oleh browser.';
           simTerminalLog.insertAdjacentHTML('afterbegin', '<div class="term-line alert">[CSP VIOLATION] Browser menolak memuat http://attacker-c2.id: Refused to load resource due to CSP directive.</div>');
+          if (window.suiteSound) window.suiteSound.play('chime');
           return;
         }
 
@@ -2126,6 +2345,7 @@ body.theme-tracing .quiz-q { color: #102A43; }
           simEvalTitle.textContent = 'Pertahanan Berhasil: Atribut HttpOnly Menyelamatkan Sesi!';
           simEvalDesc.textContent = 'Skrip XSS berhasil berjalan di browser korban, TETAPI saat membaca document.cookie, peramban mengembalikan string kosong. Cookie sesi tetap aman di penyimpanan internal HTTP browser.';
           simTerminalLog.insertAdjacentHTML('afterbegin', '<div class="term-line alert">[C2 RECEIVER] Menerima beacon dari ' + simVictimUser.value + ', tetapi Cookie bernilai KOSONG! (Gagal membajak akun).</div>');
+          if (window.suiteSound) window.suiteSound.play('chime');
           return;
         }
 
@@ -2138,6 +2358,7 @@ body.theme-tracing .quiz-q { color: #102A43; }
         simEvalDesc.textContent = 'Skrip jahat membaca document.cookie tanpa hambatan dan membisikkannya ke Attacker C2 menggunakan Image beacon. Penyerang kini memiliki token sesi untuk membajak akun secara penuh!';
         var timestamp = new Date().toLocaleTimeString();
         simTerminalLog.insertAdjacentHTML('afterbegin', '<div class="term-line exploit">[' + timestamp + '] [C2 EXFILTRASI SUKSES] IP 103.24.55.12 -> Menerima: cookie="session_id=s%3A992a77f0a82b4; role=admin" (Akun Korban Terbajak!)</div>');
+        if (window.suiteSound) window.suiteSound.play('buzz');
       });
     }
 
@@ -2226,10 +2447,12 @@ body.theme-tracing .quiz-q { color: #102A43; }
             btn.classList.add('correct');
             quizFeedbackBox.className = 'quiz-feedback safe show';
             quizFeedbackBox.textContent = 'Jawaban Benar! ' + qData.exp;
+            if (window.suiteSound) window.suiteSound.play('chime');
           } else {
             btn.classList.add('wrong');
             quizFeedbackBox.className = 'quiz-feedback danger show';
             quizFeedbackBox.textContent = 'Jawaban Kurang Tepat. ' + qData.exp;
+            if (window.suiteSound) window.suiteSound.play('buzz');
           }
           updateScore();
           renderQuestion(idx);

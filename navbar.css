@@ -22,8 +22,8 @@
 
 @media (min-width: 901px) {
   .master-nav-suite {
-    margin-left: var(--sidebar-w, 280px); /* Leave room for fixed sidebar, never overlap brand! */
-    width: calc(100% - var(--sidebar-w, 280px));
+    margin-left: var(--sidebar-w, 236px); /* Leave room for fixed sidebar, never overlap brand! */
+    width: calc(100% - var(--sidebar-w, 236px));
   }
   .master-suite-brand {
     display: none; /* Hide in navbar because sidebar already displays brand */
@@ -262,4 +262,97 @@
     grid-template-columns: 1fr;
     width: 100%;
   }
+}
+
+/* Hide top master navigation during presentation mode */
+body.present .master-nav-suite {
+  display: none !important;
+}
+
+/* Light mode — "Kertas Kalkir" for unified navigation */
+:root[data-theme="kalkir"] .master-nav-suite {
+  background: rgba(232, 227, 213, 0.95);
+  border-bottom: 1px solid rgba(29, 59, 87, 0.25);
+  box-shadow: 0 4px 20px rgba(29, 59, 87, 0.12);
+}
+
+:root[data-theme="kalkir"] .master-suite-brand .suite-tag {
+  color: #1F6FB0;
+}
+
+:root[data-theme="kalkir"] .master-suite-brand .suite-title {
+  color: #1D3B57;
+}
+
+:root[data-theme="kalkir"] .master-nav-item {
+  background: rgba(29, 59, 87, 0.05);
+  border-color: rgba(29, 59, 87, 0.18);
+  color: rgba(29, 59, 87, 0.85);
+}
+
+:root[data-theme="kalkir"] .master-nav-item:hover {
+  background: rgba(31, 111, 176, 0.12);
+  border-color: rgba(31, 111, 176, 0.45);
+  color: #1D3B57;
+}
+
+:root[data-theme="kalkir"] .master-nav-item.active {
+  background: linear-gradient(135deg, rgba(31, 111, 176, 0.22), rgba(232, 227, 213, 0.9));
+  border-color: #1F6FB0;
+  color: #1D3B57;
+  box-shadow: 0 4px 14px rgba(31, 111, 176, 0.2);
+}
+
+:root[data-theme="kalkir"] .master-nav-item .nav-badge {
+  color: #1F6FB0;
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(31, 111, 176, 0.35);
+}
+
+:root[data-theme="kalkir"] .master-nav-item.active .nav-badge {
+  background: #1F6FB0;
+  color: #fff;
+  border-color: #1F6FB0;
+}
+
+:root[data-theme="kalkir"] .sidebar-topic-switcher {
+  background: rgba(232, 227, 213, 0.75);
+  border-color: rgba(29, 59, 87, 0.2);
+}
+
+:root[data-theme="kalkir"] .topic-switcher-heading {
+  color: #1F6FB0;
+}
+
+:root[data-theme="kalkir"] .topic-switcher-heading::after {
+  background: rgba(29, 59, 87, 0.2);
+}
+
+:root[data-theme="kalkir"] .topic-btn {
+  background: rgba(29, 59, 87, 0.04);
+  border-color: rgba(29, 59, 87, 0.1);
+  color: rgba(29, 59, 87, 0.85);
+}
+
+:root[data-theme="kalkir"] .topic-btn:hover {
+  background: rgba(31, 111, 176, 0.1);
+  border-color: rgba(31, 111, 176, 0.4);
+  color: #1D3B57;
+}
+
+:root[data-theme="kalkir"] .topic-btn.active {
+  background: rgba(31, 111, 176, 0.18);
+  border-color: #1F6FB0;
+  color: #1D3B57;
+  box-shadow: inset 0 0 0 1px rgba(31, 111, 176, 0.4);
+}
+
+:root[data-theme="kalkir"] .topic-btn .btn-num {
+  background: rgba(255, 255, 255, 0.85);
+  color: #1F6FB0;
+}
+
+:root[data-theme="kalkir"] .topic-btn.active .btn-num {
+  background: #1F6FB0;
+  color: #fff;
 }
