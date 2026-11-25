@@ -6041,21 +6041,53 @@
             <h3>Relevansi Keamanan &amp; Catatan Analisis</h3>
           </div>
           <div class="notes-row stagger">
-            <div class="note">
+            <!-- <div class="note">
               <span class="big">A03</span>
               <b>XSS Termasuk Kategori Injection.</b> OWASP Top 10:2021 menempatkan Cross-Site Scripting dalam kategori
               <b>A03: Injection</b><a class="cite" href="#ref-11" title="OWASP A03:2021">11</a>. Cookie tanpa flag
               <code>HttpOnly</code> dan <code>SameSite</code> menjadikan celah ini langsung berujung pada pembajakan
               sesi (CWE-79 &amp; CWE-1004).
-            </div>
+            </div> -->
             <div class="note">
+              <span class="big">A03</span>
+              <b>XSS Termasuk Kategori Injection.</b>
+              OWASP Top 10:2021 menempatkan Cross-Site Scripting dalam
+              kategori <b>A03: Injection</b>
+              <a class="cite" href="#ref-11" title="OWASP A03:2021">11</a>.
+              XSS dapat terjadi ketika aplikasi menangani atau merender
+              input yang tidak tepercaya secara tidak aman. Cookie tanpa
+              flag <code>HttpOnly</code> berisiko dibaca melalui JavaScript
+              yang berhasil diinjeksi. Sementara itu, <code>SameSite</code>
+              terutama membantu membatasi pengiriman cookie dalam konteks
+              lintas situs untuk mengurangi risiko CSRF.
+            </div>
+            <!-- <div class="note">
               <span class="hand">Bypass Otentikasi Total…</span><br>
               …cukup dengan satu token sesi yang dieksfiltrasi. Penyerang langsung melakukan <b>impersonation
                 seketika</b>: melewati password serumit apa pun dan mengabaikan 2FA tanpa memicu alarm login.
-            </div>
+            </div> -->
             <div class="note">
+              <span class="hand">Risiko Session Hijacking</span><br>
+              Token sesi yang masih valid dapat memungkinkan penyerang
+              menyamar sebagai pengguna tanpa memasukkan ulang password.
+              Namun, dampaknya bergantung pada mekanisme autentikasi
+              dan kontrol keamanan aplikasi. MFA tidak selalu melindungi
+              sesi yang telah dicuri. Deteksi anomali, pencabutan sesi,
+              dan autentikasi ulang untuk tindakan sensitif tetap diperlukan.
+            </div>
+            <!-- <div class="note">
               <b>HTTPS saja tidak cukup.</b> Enkripsi SSL/TLS hanya melindungi data saat transit di jaringan. Begitu
               paket sampai di peramban dan didekripsi, skrip XSS lokal leluasa membaca objek DOM yang tidak diproteksi.
+            </div> -->
+            <div class="note">
+              <b>HTTPS Saja Tidak Cukup.</b>
+              HTTPS melindungi kerahasiaan dan integritas data selama
+              transmisi antara browser dan server. Namun, HTTPS tidak
+              otomatis mencegah XSS. Jika aplikasi merender input pengguna
+              secara tidak aman, skrip berbahaya tetap dapat dijalankan
+              dalam konteks halaman aplikasi. Oleh karena itu, HTTPS perlu
+              dikombinasikan dengan output encoding, penanganan DOM yang
+              aman, CSP, dan konfigurasi cookie yang tepat.
             </div>
           </div>
         </div>
@@ -6325,8 +6357,12 @@
 
                 <label class="defense-switch">
                   <div>
-                    <span>Output Encoding (HTML Sanitization)</span>
-                    <div style="font-size:11px; color:var(--bp-line-faint);">Mengubah &lt; menjadi &amp;lt;</div>
+                    <!-- <span>Output Encoding (HTML Sanitization)</span>
+                    <div style="font-size:11px; color:var(--bp-line-faint);">Mengubah &lt; menjadi &amp;lt;</div> -->
+                    <span>Contextual Output Encoding</span>
+                    <div style="font-size:11px; color:var(--bp-line-faint);">
+                      Memperlakukan input sebagai teks sesuai konteks output
+                    </div>
                   </div>
                   <input type="checkbox" class="switch-input" id="switch-encoding">
                 </label>
@@ -6399,11 +6435,22 @@
             <div class="bp-panel">
               <span class="panel-label">Lini 1 · Cookie Flag</span>
               <h3 style="font-size:16px; color:var(--allow); margin-bottom:8px;">Atribut HttpOnly</h3>
-              <p style="font-size:13px; color:var(--bp-line-soft); margin-bottom:12px;">
+              <!-- <p style="font-size:13px; color:var(--bp-line-soft); margin-bottom:12px;">
                 Saat server mengirim header <code>Set-Cookie</code> dengan flag <code>HttpOnly</code>, peramban melarang
                 JavaScript sisi klien (<code>document.cookie</code>) membaca cookie tersebut<a class="cite"
                   href="#ref-10" title="RFC 6265">10</a>. Catatan: skrip XSS tetap berjalan dan masih dapat mengirim
                 request atas nama korban, jadi HttpOnly harus dipadukan dengan CSP dan output encoding.
+              </p> -->
+              <p style="font-size:13px; color:var(--bp-line-soft); margin-bottom:12px;">
+                Saat server mengirim header <code>Set-Cookie</code> dengan
+                flag <code>HttpOnly</code>, browser tidak mengizinkan
+                JavaScript sisi klien membaca cookie tersebut melalui
+                <code>document.cookie</code>
+                <a class="cite" href="#ref-10" title="RFC 6265">10</a>.
+                Namun, skrip XSS masih mungkin berjalan dan melakukan request
+                atas nama pengguna melalui sesi yang aktif. Karena itu,
+                HttpOnly perlu dikombinasikan dengan pencegahan XSS,
+                CSP, dan praktik pengembangan aplikasi yang aman.
               </p>
               <div class="code-block" style="font-size:11px;">
                 Set-Cookie: PHPSESSID=xyz123abc;<br>
@@ -6415,10 +6462,21 @@
             <div class="bp-panel">
               <span class="panel-label">Lini 2 · Skrip Policy</span>
               <h3 style="font-size:16px; color:var(--bp-cyan); margin-bottom:8px;">Content Security Policy</h3>
-              <p style="font-size:13px; color:var(--bp-line-soft); margin-bottom:12px;">
+              <!-- <p style="font-size:13px; color:var(--bp-line-soft); margin-bottom:12px;">
                 Header HTTP yang membatasi asal skrip yang boleh dijalankan peramban. Mematikan
                 <code>'unsafe-inline'</code> membuat skrip injeksi penyerang ditolak peramban<a class="cite"
                   href="#ref-12" title="MDN CSP">12</a>.
+              </p> -->
+              <p style="font-size:13px; color:var(--bp-line-soft); margin-bottom:12px;">
+                Content Security Policy (CSP) adalah header HTTP yang
+                membatasi sumber daya dan skrip yang diizinkan untuk
+                dijalankan oleh browser. Kebijakan seperti
+                <code>script-src</code> dapat membantu membatasi eksekusi
+                skrip yang tidak diizinkan. Namun, efektivitas CSP bergantung
+                pada konfigurasi kebijakannya. CSP merupakan pertahanan
+                tambahan dan tidak menggantikan output encoding maupun
+                penanganan input yang aman.
+                <a class="cite" href="#ref-12" title="MDN CSP">12</a>
               </p>
               <div class="code-block" style="font-size:11px;">
                 Content-Security-Policy: <br>
@@ -6507,7 +6565,7 @@
           <div class="block__title"><span class="tag">05.3</span>
             <h3>Alur Remediasi Kerentanan (Step-by-Step Fix)</h3>
           </div>
-          <ol class="fixflow stagger">
+          <!-- <ol class="fixflow stagger">
             <li><b>Audit Titik Input &amp; Sink DOM</b>Pindai seluruh basis kode untuk menemukan pembacaan
               <code>document.cookie</code> dan penggunaan sink berbahaya seperti <code>innerHTML</code>.</li>
             <li><b>Hardening Konfigurasi Cookie</b>Ubah inisialisasi sesi di backend server agar menyertakan flag
@@ -6516,6 +6574,38 @@
               evaluasi skrip inline tanpa token nonce terverifikasi.</li>
             <li><b>Validasi &amp; Regression Test</b>Jalankan uji penetrasi otomatis untuk memastikan eksfiltrasi cookie
               via peramban menghasilkan nilai kosong (null).</li>
+          </ol> -->
+          <ol class="fixflow stagger">
+            <li>
+              <b>Audit Titik Input &amp; Sink DOM</b>
+              Identifikasi sumber input yang tidak tepercaya dan cara
+              aplikasi merendernya. Periksa penggunaan sink DOM seperti
+              <code>innerHTML</code> dan prioritaskan API yang
+              memperlakukan input sebagai teks, seperti
+              <code>textContent</code>, jika sesuai.
+            </li>
+            <li>
+              <b>Hardening Konfigurasi Cookie</b>
+              Konfigurasikan cookie sesi dengan atribut
+              <code>HttpOnly</code>, <code>Secure</code>, dan
+              <code>SameSite</code> sesuai kebutuhan aplikasi.
+              Atribut ini memiliki fungsi berbeda dan tidak menggantikan
+              pencegahan XSS.
+            </li>
+            <li>
+              <b>Implementasi CSP</b>
+              Terapkan header <code>Content-Security-Policy</code>
+              dengan kebijakan yang ketat dan sesuai kebutuhan aplikasi.
+              Hindari penggunaan izin skrip inline yang terlalu longgar
+              dan gunakan nonce atau hash bila sesuai.
+            </li>
+            <li>
+              <b>Validasi &amp; Regression Test</b>
+              Uji aplikasi pada lingkungan yang diizinkan untuk memastikan
+              input tidak tepercaya ditampilkan secara aman, konfigurasi
+              cookie sesuai harapan, dan kebijakan CSP bekerja.
+              Dokumentasikan hasil pengujian dan perbaiki temuan yang ada.
+            </li>
           </ol>
         </div>
 
@@ -6596,8 +6686,10 @@
               [Online]. Available: https://owasp.org/Top10/A03_2021-Injection/</li>
             <li id="ref-12">[12] Mozilla, &ldquo;Content Security Policy (CSP),&rdquo; <i>MDN Web Docs</i>. [Online].
               Available: https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP</li>
-            <li id="ref-13">[13] EC-Council, <i>Ethical Hacking Essentials (EHE)</i> course module on session hijacking
-              and XSS, slide [LENGKAPI NOMOR SLIDE].</li>
+            <li id="ref-13">[13] EC-Council, <i>Ethical Hacking Essentials (EHE) v2</i>,
+              course module, “Network Level Attacks &amp; Defense,” Modul 07,
+              Paket 2, slide 73, 76–77, materi kuliah Program Studi Teknik Informatika,
+              Universitas Ciputra, 2026.</li>
           </ul>
         </div>
       </div>
@@ -6975,8 +7067,13 @@
           if (isEncoding) {
             setBadge('safe', 'Dinetralisir (Encoding)');
             domCookieDisplay.textContent = '(Skrip tidak pernah dijalankan)';
-            showEval('safe', 'Mitigasi Berhasil: Output Encoding Aktif!',
-              'Karakter berbahaya seperti < dan > diubah menjadi entitas &lt; dan &gt;. Peramban korban merendernya sebagai teks biasa, sehingga skrip penyerang tidak pernah dieksekusi.');
+            // showEval('safe', 'Mitigasi Berhasil: Output Encoding Aktif!',
+            //   'Karakter berbahaya seperti < dan > diubah menjadi entitas &lt; dan &gt;. Peramban korban merendernya sebagai teks biasa, sehingga skrip penyerang tidak pernah dieksekusi.');           
+            showEval(
+              'safe',
+              'Simulasi: Input Diproses sebagai Teks',
+              'Model mengasumsikan output encoding yang sesuai dengan konteks telah diterapkan. Input berbahaya ditampilkan sebagai teks dan tidak ditafsirkan sebagai skrip. Pada aplikasi nyata, keamanan bergantung pada konteks output dan cara data dirender.'
+            );
             logLine('safe', '[BLOCKED] Muatan dinetralisir oleh Contextual Output Encoding. Tidak ada eksekusi JS.');
             if (window.suiteSound) window.suiteSound.play('chime');
             return;
@@ -6985,8 +7082,13 @@
           if (isCSP) {
             setBadge('safe', 'Diblokir (CSP)');
             domCookieDisplay.textContent = '(Skrip inline diblokir sebelum berjalan)';
-            showEval('safe', 'Mitigasi Berhasil: Content Security Policy (CSP) Aktif!',
-              "Dengan default-src 'self' dan img-src 'self', peramban menolak menjalankan skrip/event handler inline. Seandainya skrip lolos, permintaan beacon ke " + host + " tetap ditolak oleh img-src 'self'.");
+            // showEval('safe', 'Mitigasi Berhasil: Content Security Policy (CSP) Aktif!',
+            //   "Dengan default-src 'self' dan img-src 'self', peramban menolak menjalankan skrip/event handler inline. Seandainya skrip lolos, permintaan beacon ke " + host + " tetap ditolak oleh img-src 'self'.");           
+            showEval(
+              'safe',
+              'Simulasi: CSP Membatasi Perilaku Skrip',
+              'Dalam model ini, kebijakan CSP diasumsikan memblokir skrip inline dan tujuan beacon yang tidak diizinkan. Pada aplikasi nyata, hasil bergantung pada header CSP lengkap, sumber skrip, dan konteks eksekusi. Simulasi ini tidak memasang header CSP sungguhan.'
+            );
             logLine('alert', "[CSP VIOLATION] Refused to execute inline script/handler because it violates directive \"default-src 'self'\".");
             logLine('alert', "[CSP VIOLATION] Beacon ke http://" + host + " juga akan ditolak oleh img-src 'self'.");
             if (window.suiteSound) window.suiteSound.play('chime');
@@ -7005,8 +7107,13 @@
           if (isHttpOnly) {
             setBadge('safe', 'document.cookie: DILINDUNGI (HttpOnly)');
             domCookieDisplay.textContent = '(string kosong: cookie bertanda HttpOnly tidak terlihat oleh JavaScript)';
-            showEval('safe', 'Pertahanan Sebagian Berhasil: HttpOnly Melindungi Token Sesi',
-              'Skrip XSS tetap berjalan, tetapi document.cookie tidak mengandung cookie sesi sehingga token tidak bisa dicuri. Catatan: skrip masih dapat mengirim request atas nama korban selama sesi aktif, jadi HttpOnly harus dikombinasikan dengan CSP dan output encoding.');
+            // showEval('safe', 'Pertahanan Sebagian Berhasil: HttpOnly Melindungi Token Sesi',
+            //   'Skrip XSS tetap berjalan, tetapi document.cookie tidak mengandung cookie sesi sehingga token tidak bisa dicuri. Catatan: skrip masih dapat mengirim request atas nama korban selama sesi aktif, jadi HttpOnly harus dikombinasikan dengan CSP dan output encoding.');          
+            showEval(
+              'safe',
+              'Perlindungan Cookie: HttpOnly Aktif',
+              'Cookie sesi bertanda HttpOnly tidak dapat dibaca melalui document.cookie. Namun, skrip XSS masih mungkin berjalan dan melakukan request atas nama pengguna melalui sesi aktif. Hasil ini merupakan simulasi lokal, bukan bukti bahwa aplikasi nyata telah aman.'
+            );
             if (hasBeacon) {
               logLine('alert', '[C2 RECEIVER] Beacon dari ' + victim + ' diterima di ' + host + ', tetapi parameter cookie KOSONG. Pembajakan sesi gagal.');
             } else {
@@ -7071,7 +7178,8 @@
             "Stored XSS hanya bisa dicegah dengan HttpOnly, sedangkan Reflected XSS hanya bisa dicegah dengan firewall."
           ],
           ans: 1,
-          exp: "Benar! Stored XSS bersifat persisten di server sehingga memengaruhi banyak korban, sedangkan Reflected XSS bergantung pada korban yang membuka URL berbahaya. Keduanya dapat mencuri cookie dan dicegah dengan output encoding, CSP, serta HttpOnly."
+          // exp: "Benar! Stored XSS bersifat persisten di server sehingga memengaruhi banyak korban, sedangkan Reflected XSS bergantung pada korban yang membuka URL berbahaya. Keduanya dapat mencuri cookie dan dicegah dengan output encoding, CSP, serta HttpOnly."
+          exp: "Benar! Stored XSS menyimpan payload pada aplikasi sehingga dapat memengaruhi pengguna yang membuka konten rentan, sedangkan Reflected XSS melibatkan input yang dipantulkan melalui respons aplikasi. Keduanya dapat menimbulkan risiko pencurian cookie jika kondisi memungkinkan. Output encoding yang sesuai membantu mencegah injeksi, CSP memberikan pertahanan tambahan, dan HttpOnly membatasi pembacaan cookie melalui JavaScript."
         },
         {
           q: "4. Di Security Operations Center (SOC), indikator apa yang paling sering menandakan bahwa sebuah cookie sesi telah dicuri dan disalahgunakan?",
