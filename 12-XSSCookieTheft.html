@@ -6203,6 +6203,24 @@
             </div>
           </div>
         </div>
+        <div class="block">
+          <div class="block__title"><span class="tag">02.3</span>
+            <h3>Contoh Kasus: Kolom Komentar Portal bank-rakyat.id</h3>
+          </div>
+          <div class="bp-panel">
+            <p style="font-size:13px; color:var(--bp-line-soft);">
+              Sebuah portal bank fiktif menyediakan kolom komentar pada halaman pengumuman. Aplikasi menyimpan komentar
+              ke database lalu menampilkannya tanpa output encoding. Penyerang mengirim komentar berisi skrip yang
+              membaca <code>document.cookie</code> dan mengirimkannya ke <code>attacker-c2.id</code>. Setiap nasabah
+              yang sedang login dan membuka halaman itu otomatis menjalankan skrip tersebut (Stored XSS). Penyerang lalu
+              memasang token sesi yang terkumpul di peramban miliknya dan masuk sebagai nasabah tanpa kata sandi.
+              Skenario ini dapat dicoba pada Sheet 04 dengan Skenario A, lalu dibandingkan setelah HttpOnly, CSP, atau
+              output encoding diaktifkan.
+            </p>
+            <p style="font-size:12px; color:var(--bp-line-faint); margin:0;">Seluruh nama domain dan data pada contoh
+              ini fiktif dan hanya untuk tujuan pembelajaran.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -6253,7 +6271,7 @@
             <div class="step-num">05</div>
             <div class="step-body">
               <h4><span>Eksfiltrasi Cookie Siluman (Beacon Transmit)</span><span class="step-tag">Tahap 5</span></h4>
-              <p>Peramban korban mengeksekusi skrip, membaca cookie sesi, dan menembakkannya ke server penyerang tanpa
+              <p>Peramban korban mengeksekusi skrip, membaca cookie sesi, dan mengirimkannya ke server penyerang tanpa
                 jejak di layar.</p>
             </div>
           </div>
@@ -6640,6 +6658,39 @@
               indikator utama di SIEM/SOC adalah <b>IP Drift</b> (alamat IP sumber berubah mendadak pada sesi yang sama)
               dan <b>Diff-UA</b> (User-Agent berbeda pada cookie yang sama). Respons yang disarankan: cabut (invalidate)
               sesi, paksa login ulang, dan telusuri sink XSS yang menjadi sumber kebocoran.
+            </p>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block__title"><span class="tag">05.5</span>
+            <h3>Kesimpulan &amp; Rekomendasi Keamanan</h3>
+          </div>
+          <div class="bp-panel">
+            <p style="font-size:13px; color:var(--bp-line-soft);">
+              Celah XSS yang tampak kecil dapat berujung pada pengambilalihan akun, karena token sesi di cookie
+              berfungsi seperti kredensial yang sah. HTTPS tidak menghentikan serangan ini sebab skrip berjalan di dalam
+              peramban setelah data didekripsi. Pertahanan yang efektif bersifat berlapis:
+            </p>
+            <ul
+              style="font-size:13px; color:var(--bp-line-soft); padding-left:20px; display:flex; flex-direction:column; gap:6px;">
+              <li>Terapkan flag <code>HttpOnly</code>, <code>Secure</code>, dan <code>SameSite</code> pada semua cookie
+                sesi<a class="cite" href="#ref-10" title="RFC 6265">10</a>.</li>
+              <li>Terapkan contextual output encoding pada seluruh data yang dirender ke halaman, dan validasi input di
+                sisi server<a class="cite" href="#ref-9" title="OWASP XSS Prevention">9</a>.</li>
+              <li>Terapkan Content-Security-Policy yang ketat (<code>script-src 'self'</code> atau nonce) dan batasi
+                <code>img-src</code>/<code>connect-src</code> ke domain tepercaya<a class="cite" href="#ref-12"
+                  title="MDN CSP">12</a>.</li>
+              <li>Gunakan HTTPS dengan HSTS untuk seluruh transfer token otentikasi.</li>
+              <li>Hindari sink DOM berbahaya seperti <code>innerHTML</code> dan <code>eval()</code>.</li>
+              <li>Pantau anomali sesi (perubahan IP atau User-Agent mendadak), terapkan masa berlaku sesi yang singkat,
+                dan regenerasi token setelah login.</li>
+              <li>Lakukan pengujian keamanan rutin (code review dan uji penetrasi) pada titik input dan output<a
+                  class="cite" href="#ref-11" title="OWASP A03:2021">11</a>.</li>
+            </ul>
+            <p style="font-size:12.5px; color:var(--bp-line-soft); margin-top:12px;">
+              <b>Keterbatasan simulator:</b> berjalan sepenuhnya di sisi klien dengan data fiktif; logikanya
+              disederhanakan sehingga belum mencakup variasi payload, bypass filter, DOM-based XSS, nonce/hash CSP,
+              maupun simulasi deteksi SOC.
             </p>
           </div>
         </div>
