@@ -1,9 +1,9 @@
 /**
  * navbar.js — Unified Navigation Controller
  * Connects 3 EHE Topics into 1 seamless learning suite:
- * 1. 01 — Application Layer DDoS (8-ApplicationLayerDDoS.html)
- * 2. 02 — XSS Cookie Theft Mechanics (8-XSSCookieTheft.html)
- * 3. 03 — Konstruksi Rule-Base Firewall (konstruksi-rulebase-firewall.html)
+ * 1. 01 — Application Layer DDoS (12-ApplicationLayerDDoS.html)
+ * 2. 02 — XSS Cookie Theft Mechanics (12-XSSCookieTheft.html)
+ * 3. 03 — Konstruksi Rule-Base Firewall (12-KonstruksiRuleBaseFirewall.html)
  */
 
 (function () {
@@ -15,7 +15,7 @@
       num: '01',
       name: 'App Layer DDoS',
       sub: 'HTTP GET & POST Flood',
-      href: '8-ApplicationLayerDDoS.html',
+      href: '12-ApplicationLayerDDoS.html',
       match: ['ddos', 'applicationlayer']
     },
     {
@@ -23,7 +23,7 @@
       num: '02',
       name: 'XSS Cookie Theft',
       sub: 'Pencurian Sesi DOM',
-      href: '8-XSSCookieTheft.html',
+      href: '12-XSSCookieTheft.html',
       match: ['xss', 'cookietheft']
     },
     {
@@ -31,7 +31,7 @@
       num: '03',
       name: 'Rulebase Firewall',
       sub: 'Penyaringan Paket Jaringan',
-      href: 'konstruksi-rulebase-firewall.html',
+      href: '12-KonstruksiRuleBaseFirewall.html',
       match: ['firewall', 'konstruksi']
     }
   ];
@@ -89,21 +89,21 @@
       return '<a href="' + t.href + '" class="master-nav-item' + isActive + '" data-topic="' + t.id + '">' +
         '<span class="nav-badge">' + t.num + '</span>' +
         '<div class="nav-info">' +
-          '<div class="nav-name">' + t.name + '</div>' +
-          '<div class="nav-desc">' + t.sub + '</div>' +
+        '<div class="nav-name">' + t.name + '</div>' +
+        '<div class="nav-desc">' + t.sub + '</div>' +
         '</div>' +
-      '</a>';
+        '</a>';
     }).join('');
 
     nav.innerHTML = '<div class="master-nav-inner">' +
       '<div class="master-suite-brand">' +
-        '<span class="suite-tag">EHE LEARNING SUITE</span>' +
-        '<span class="suite-title">Cybersecurity Interactive Lab</span>' +
+      '<span class="suite-tag">EHE LEARNING SUITE</span>' +
+      '<span class="suite-title">Cybersecurity Interactive Lab</span>' +
       '</div>' +
       '<div class="master-nav-tabs">' +
-        tabsHtml +
+      tabsHtml +
       '</div>' +
-    '</div>';
+      '</div>';
 
     document.body.insertBefore(nav, document.body.firstChild);
   }
@@ -121,7 +121,7 @@
       return '<a href="' + t.href + '" class="topic-btn' + isActive + '" data-topic="' + t.id + '">' +
         '<span class="btn-num">' + t.num + '</span>' +
         '<span class="btn-text"><b>' + t.name + '</b><small>' + t.sub + '</small></span>' +
-      '</a>';
+        '</a>';
     }).join('');
 
     switcher.innerHTML = '<div class="topic-switcher-heading">PILIH TOPIK MATERI</div>' +

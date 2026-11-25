@@ -1,9 +1,9 @@
 /* ==========================================================================
    navbar.css — Unified Navigation Module for Cybersecurity Learning Suite
    Connects:
-   - Topic 01: Application Layer DDoS (8-ApplicationLayerDDoS.html)
-   - Topic 02: XSS Cookie Theft Mechanics (8-XSSCookieTheft.html / XSS-CookieTheft-Mechanics.html)
-   - Topic 03: Konstruksi Rule-Base Firewall (konstruksi-rulebase-firewall.html)
+   - Topic 01: Application Layer DDoS (12-ApplicationLayerDDoS.html)
+   - Topic 02: XSS Cookie Theft Mechanics (12-XSSCookieTheft.html / XSS-CookieTheft-Mechanics.html)
+   - Topic 03: Konstruksi Rule-Base Firewall (12-KonstruksiRuleBaseFirewall.html)
    ========================================================================== */
 
 /* Top Master Navigation Bar */
@@ -22,12 +22,16 @@
 
 @media (min-width: 901px) {
   .master-nav-suite {
-    margin-left: var(--sidebar-w, 236px); /* Leave room for fixed sidebar, never overlap brand! */
+    margin-left: var(--sidebar-w, 236px);
+    /* Leave room for fixed sidebar, never overlap brand! */
     width: calc(100% - var(--sidebar-w, 236px));
   }
+
   .master-suite-brand {
-    display: none; /* Hide in navbar because sidebar already displays brand */
+    display: none;
+    /* Hide in navbar because sidebar already displays brand */
   }
+
   .master-nav-inner {
     justify-content: center;
   }
@@ -70,13 +74,15 @@
   gap: 12px;
   width: 100%;
   max-width: 860px;
-  margin: 0 auto; /* Centered in the navbar */
+  margin: 0 auto;
+  /* Centered in the navbar */
 }
 
 .master-nav-item {
   display: flex;
   align-items: center;
-  justify-content: center; /* Center items inside the tab */
+  justify-content: center;
+  /* Center items inside the tab */
   text-align: center;
   gap: 10px;
   padding: 8px 14px;
@@ -127,7 +133,8 @@
 .master-nav-item .nav-info {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center the text */
+  align-items: center;
+  /* Center the text */
   justify-content: center;
   text-align: center;
   overflow: hidden;
