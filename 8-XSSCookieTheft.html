@@ -6187,10 +6187,18 @@
             <div class="bp-panel">
               <span class="panel-label">Layer Classification</span>
               <h4 style="font-size:14px; color:var(--deny); margin-bottom:8px;">Application vs Network Hijacking</h4>
-              <p style="font-size:12.5px; color:var(--bp-line-soft);">
+              <!-- <p style="font-size:12.5px; color:var(--bp-line-soft);">
                 Network Hijacking (TCP) membajak nomor urut paket di Layer 4. Sedangkan XSS Cookie Theft bekerja di
                 <b>Layer 7 (Aplikasi)</b>: mencuri token otentikasi level HTTP, sehingga penyerang tidak perlu berada di
                 jaringan Wi-Fi/LAN yang sama dengan korban!
+              </p> -->
+              <p style="font-size:12.5px; color:var(--bp-line-soft);">
+                Network Hijacking (TCP) membajak nomor urut paket di Layer 4.
+                Sedangkan XSS Cookie Theft bekerja di
+                <b>Layer 7 (Aplikasi)</b>: mencuri token autentikasi level HTTP,
+                sehingga penyerang tidak perlu berada di jaringan Wi-Fi/LAN
+                yang sama dengan korban.
+                <a class="cite" href="#ref-13" title="EHE course module">13</a>
               </p>
             </div>
           </div>
@@ -6479,9 +6487,13 @@
                 <a class="cite" href="#ref-12" title="MDN CSP">12</a>
               </p>
               <div class="code-block" style="font-size:11px;">
+                <!-- Content-Security-Policy: <br>
+                &nbsp;&nbsp;default-src 'self';<br>
+                &nbsp;&nbsp;<span class="code-hl">script-src 'self'</span>; -->
                 Content-Security-Policy: <br>
                 &nbsp;&nbsp;default-src 'self';<br>
-                &nbsp;&nbsp;<span class="code-hl">script-src 'self'</span>;
+                &nbsp;&nbsp;<span class="code-hl">script-src 'self';</span><br>
+                &nbsp;&nbsp;<span class="code-hl">img-src 'self';</span>
               </div>
             </div>
 
@@ -6524,8 +6536,13 @@
                   <td style="padding:10px 14px; font-weight:700; color:#fff;">Pencurian Sesi DOM</td>
                   <td style="padding:10px 14px; color:var(--bp-line-soft);"><code>document.cookie</code> dibaca skrip
                     peretas</td>
-                  <td style="padding:10px 14px;"><span class="chip chip--safe">HttpOnly</span> Larang mutlak peramban
-                    mengekspos cookie ke JavaScript engine.</td>
+                  <!-- <td style="padding:10px 14px;"><span class="chip chip--safe">HttpOnly</span> Larang mutlak peramban
+                    mengekspos cookie ke JavaScript engine.</td> -->
+                  <td style="padding:10px 14px;">
+                    <span class="chip chip--safe">HttpOnly</span>
+                    Cegah JavaScript membaca cookie melalui
+                    <code>document.cookie</code>.
+                  </td>
                 </tr>
                 <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
                   <td style="padding:10px 14px; font-weight:700; color:#fff;">Injeksi Skrip Siluman</td>
@@ -6536,8 +6553,12 @@
                 </tr>
                 <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
                   <td style="padding:10px 14px; font-weight:700; color:#fff;">Eksfiltrasi Image Beacon</td>
-                  <td style="padding:10px 14px; color:var(--bp-line-soft);"><code>new Image().src = ...</code> tembus
-                    CORS</td>
+                  <!-- <td style="padding:10px 14px; color:var(--bp-line-soft);"><code>new Image().src = ...</code> tembus
+                    CORS</td> -->
+                  <td style="padding:10px 14px; color:var(--bp-line-soft);">
+                    <code>new Image().src = ...</code> memicu request gambar
+                    lintas origin tanpa CORS preflight
+                  </td>
                   <td style="padding:10px 14px;"><span class="chip chip--safe">CSP img-src 'self'</span> Batasi
                     destinasi pengiriman data gambar hanya ke host server resmi.</td>
                 </tr>
